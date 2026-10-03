@@ -8,7 +8,8 @@
 import UIKit
 
 final class ImagesListViewController: UIViewController {
-  
+  private let showSingleImageSegueIdentifier = "ShowSingleImage" // переменная принимает указатель сегвея
+    
     @IBOutlet private var tableView: UITableView!
     
     
@@ -23,11 +24,30 @@ final class ImagesListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+        tableView.dataSource = self
+        tableView.delegate = self
+        
         tableView.rowHeight = 200
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         // Программный способ прописать идентификатор ячейки в таблице
         //tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == showSingleImageSegueIdentifier {
+            guard
+                let viewController = segue.destination as? SingleImageViewController,
+                let indexPath = sender as? IndexPath
+            else {
+                assertionFailure("Invalid segue destination")
+                return
+            }
+            
+            let image = UIImage(named: photosName[indexPath.row])
+            viewController.image = image // передаем картинку через свойтсво
+        } else {
+            super.prepare(for: segue, sender: sender)
+        }
     }
 }
 
@@ -51,7 +71,6 @@ extension ImagesListViewController: UITableViewDataSource {
         // метод для конфигурирования ячейки для созданной ячейки imageListCell
         configCell(for: imageListCell, with: indexPath)
         
-        
         // выдаем готовую, сконфигурированную ячейку
         return imageListCell
     }
@@ -62,8 +81,7 @@ extension ImagesListViewController {
     
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath){
         
-        guard let image = UIImage(named: photosName[indexPath.row]) else { return
-        }
+        guard let image = UIImage(named: photosName[indexPath.row]) else { return }
         
         cell.cellImage.image = image
         cell.titleLabel.text = dateFormatter.string(from: Date())
@@ -78,7 +96,8 @@ extension ImagesListViewController {
 // ДЕЛЕГАТ таблицы
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        // прописываем переход (сегвей)
+        performSegue(withIdentifier: showSingleImageSegueIdentifier, sender: indexPath)
     }
     
     // Здесь будет метод задания размеров ячейки
@@ -94,4 +113,5 @@ extension ImagesListViewController: UITableViewDelegate {
         let cellHeight = image.size.height * scale + imageInsets.top + imageInsets.bottom
         return cellHeight
     }
+
 }
