@@ -25,12 +25,13 @@ final class ProfileViewController: UIViewController {
         let profileImageView = UIImageView(image: profileImage)
         profileImageView.backgroundColor = .gray
         profileImageView.translatesAutoresizingMaskIntoConstraints = false
+        profileImageView.layer.cornerRadius = 35
         view.addSubview(profileImageView)
         
         // зададим имя
         let profileName = UILabel()
         profileName.text = "Алексей"
-        profileName.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        profileName.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         profileName.textColor = .ypWhiteIOS
         profileName.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(profileName)
@@ -38,7 +39,8 @@ final class ProfileViewController: UIViewController {
         // мыло
         let profileEmail = UILabel()
         profileEmail.text = "alex@gmail.com"
-        profileEmail.textColor = .ypWhiteAlpha50IOS
+        profileEmail.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+        profileEmail.textColor = .ypGrayIOS
         profileEmail.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(profileEmail)
         
@@ -46,7 +48,8 @@ final class ProfileViewController: UIViewController {
         let descriptionLabel = UILabel()
         descriptionLabel.text = "Профиль"
         descriptionLabel.numberOfLines = 0
-        descriptionLabel.textColor = .ypGrayIOS
+        descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+        descriptionLabel.textColor = .ypWhiteIOS
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(descriptionLabel)
         
@@ -61,6 +64,7 @@ final class ProfileViewController: UIViewController {
             action: #selector(didTapButton) // активация цели (функции)
             )
         profileButton.translatesAutoresizingMaskIntoConstraints = false
+        profileButton.tintColor = .ypRedIOS
         view.addSubview(profileButton)
         
         
@@ -69,28 +73,28 @@ final class ProfileViewController: UIViewController {
             // Аватар
             profileImageView.widthAnchor.constraint(equalToConstant: 70),
             profileImageView.heightAnchor.constraint(equalToConstant: 70),
-            profileImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            profileImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            profileImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
+            profileImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             
             // Имя
-            profileName.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 20),
-            profileName.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            profileName.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8),
+            profileName.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             profileName.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -40), // чтобы не обрезалось
             
             // мыло
-            profileEmail.topAnchor.constraint(equalTo: profileName.bottomAnchor, constant: 20),
-            profileEmail.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            profileEmail.topAnchor.constraint(equalTo: profileName.bottomAnchor, constant: 8),
+            profileEmail.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             profileEmail.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -20),
             
             // Описание
-            descriptionLabel.topAnchor.constraint(equalTo: profileEmail.bottomAnchor, constant: 20),
-            descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            descriptionLabel.topAnchor.constraint(equalTo: profileEmail.bottomAnchor, constant: 8),
+            descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descriptionLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -20),
             descriptionLabel.bottomAnchor.constraint(greaterThanOrEqualTo: profileEmail.bottomAnchor, constant: 40), // минимальная высота
             
             // кнопочка
-            profileButton.topAnchor.constraint(equalTo: profileImageView.topAnchor),
-            profileButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            profileButton.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor),
+            profileButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             profileButton.widthAnchor.constraint(equalToConstant: 44),
             profileButton.heightAnchor.constraint(equalToConstant: 44),
             ])
