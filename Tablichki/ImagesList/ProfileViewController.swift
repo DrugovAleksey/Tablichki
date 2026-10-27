@@ -1,8 +1,8 @@
 //
 //  ProfileViewController.swift
-//  Tablichki
+//  TablichkiKodom
 //
-//  Created by Мой БУК on 18.07.2026.
+//  Created by Мой БУК on 21.10.2026.
 //
 
 import UIKit
@@ -14,12 +14,15 @@ final class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         person()
-        
+        print(" Это ProfileViewController ")
         
     }
     
     // Функция задания параметров персоны
     func person () {
+        
+        view.backgroundColor = .ypBlackIOS
+        
         // зададим картинку
         let profileImage = UIImage(systemName: "person.crop.circle.fill")
         let profileImageView = UIImageView(image: profileImage)
@@ -63,6 +66,8 @@ final class ProfileViewController: UIViewController {
             target: self,
             action: #selector(didTapButton) // активация цели (функции)
             )
+        
+        
         profileButton.translatesAutoresizingMaskIntoConstraints = false
         profileButton.tintColor = .ypRedIOS
         view.addSubview(profileButton)
@@ -103,20 +108,13 @@ final class ProfileViewController: UIViewController {
         view.bringSubviewToFront(profileButton)
     }
     
+    
     // цель. Акцивация функции которая выполняется по нажатию на кнопку
     @objc func didTapButton() {
         print("Tapped")
         
-       // let listVC = ImagesListViewController()
-        performSegue(withIdentifier: showImagesList, sender: self)
-
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        super.prepare(for: segue, sender: sender)
-        if segue.identifier == showImagesList,
-           let dest = segue.destination as? ImagesListViewController {
-            // можно передать данные, если нужно, но какие?
-        }
+        guard let tabBarController = self.tabBarController else { return }
+        tabBarController.selectedIndex = 0
     }
 }
+
