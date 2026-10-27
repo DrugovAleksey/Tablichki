@@ -8,7 +8,9 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController, UIScrollViewDelegate {
-
+    
+    // переменная замыкания для кнопки ЛАЙКа в этом случае вместо делегата. Делегат не используем
+    var onLikeTapped: ((CellModel) -> Void)?
     
     // 1. зададим ScrollView - как приватное свойство класса
     private let scrollView = UIScrollView()
@@ -25,17 +27,18 @@ final class SingleImageViewController: UIViewController, UIScrollViewDelegate {
         }
     }
     
-    // кнопка возврата (dismiss)
+    
+    // MARK: - кнопка возврата (dismiss)
     private lazy var dismissButton : UIButton = {
         // вложим картику из ассетов
         let imageDismissButton = UIImage(named: "Backward")
         // теперь пропишим саму кнопку отмены
         let btn = UIButton.systemButton(
-            with: imageDismissButton ?? UIImage(),
+            with: imageDismissButton?.withRenderingMode(.alwaysOriginal) ?? UIImage(),
             target: self,
             action: #selector(dismissTappedButton)
         )
-        btn.tintColor = .ypBackgroundIOS
+      //  btn.tintColor = .
         return btn
     }()
     
@@ -45,17 +48,65 @@ final class SingleImageViewController: UIViewController, UIScrollViewDelegate {
     }
     
     
-    // замарочимся кнопкой и создадим ее
+    // MARK: - создадим кнопку ЛАЙКа
+    lazy var likeButton : UIButton = {
+        let like = UIButton()
+     //   like.tintColor = .red
+        like.layer.cornerRadius = 25
+        like.backgroundColor = .ypBlackIOS
+        like.isUserInteractionEnabled = true //гарантирует, что кнопка будет принимать касания и участвовать в обработке событий
+        like.addTarget(self, action: #selector(likeButtonTarget), for: .touchUpInside)
+        return like
+    }()
+    
+    // Создаем модель в переменной чтобы передать ее в замыкании
+    var currentCellModel : CellModel?
+    
+    @objc func likeButtonTarget(){
+        print( " Кнопка Лайка нажата ")
+        
+        guard let model = currentCellModel else { return }
+        
+        // инвертируем локально, чтобы сердечко в большом фото поменялось мгновенно
+        var localModel = model
+        localModel.isActiveButton.toggle()
+        currentCellModel = localModel
+        updateLikeButton()
+        
+        // 4. Пробрасываем событие наружу через замыкание
+        onLikeTapped?(model)
+    }
+    
+    private func updateLikeButton() {
+        guard let model = currentCellModel else {
+            // если модели нет - ставим нейтральное состояние
+            likeButton.setImage(UIImage(named: "heart")?.withRenderingMode(.alwaysOriginal), for: .normal)
+            likeButton.tintColor = .gray
+            return
+        }
+        
+        if model.isActiveButton {
+            likeButton.setImage(UIImage(named: "Active"), for: .normal)
+        } else {
+            likeButton.setImage(UIImage(named: "No Active"), for: .normal)
+        }
+    }
+    
+    
+    
+    // MARK: - замарочимся с кнопкой ПОДЕЛИТЬСЯ и создадим ее
     private lazy var podelitsayButton : UIButton = {
         // сначала картинку для кнопки подберем
         let imageButton = UIImage(named: "Sharing")
         // теперь саму кнопку с картинкой, целью и сектором функции
         let button = UIButton.systemButton(
-            with: imageButton ?? UIImage(),
+            with: imageButton?.withRenderingMode(.alwaysOriginal) ?? UIImage(),
             target: self,
             action: #selector(buttonAction)
         )
         button.tintColor = .ypBlackIOS
+        button.backgroundColor = .ypBlackIOS
+        button.layer.cornerRadius = 25
         return button
     }()
     
@@ -69,11 +120,14 @@ final class SingleImageViewController: UIViewController, UIScrollViewDelegate {
     }
     
     
+    
     // функция обновляющая размер картинки
     private func updateImage(_ image: UIImage){
         singleImageView.image = image
         rescaleAndCenterImageInScrollView(image: image)
     }
+    
+
     
     
     override func viewDidLoad() {
@@ -117,22 +171,39 @@ final class SingleImageViewController: UIViewController, UIScrollViewDelegate {
         view.addSubview(dismissButton)
         dismissButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            dismissButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
-            dismissButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-            dismissButton.widthAnchor.constraint(equalToConstant: 44),
-            dismissButton.heightAnchor.constraint(equalToConstant: 44)
+            dismissButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 9),
+            dismissButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
+            dismissButton.widthAnchor.constraint(equalToConstant: 24),
+            dismissButton.heightAnchor.constraint(equalToConstant: 24)
         ])
         
+        // 10. Кнопка ЛАЙК
+        view.addSubview(likeButton)
+        likeButton.translatesAutoresizingMaskIntoConstraints = false
+//        likeButton.isEnabled = ((currentCellModel?.isActiveButton) != nil)
+//        if likeButton.isEnabled == true {
+//            likeButton.setImage(UIImage(named: "Active"), for: .normal)
+//        } else {
+//            likeButton.setImage(UIImage(named: "No Active"), for: .normal)
+//        }
         
-        // 10. Кнопка поделиться добавляем и задаем привязки
+        NSLayoutConstraint.activate([
+            likeButton.widthAnchor.constraint(equalToConstant: 51),
+            likeButton.heightAnchor.constraint(equalToConstant: 51),
+            likeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 68),
+            likeButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+        ])
+        
+        // 11. Кнопка поделиться добавляем и задаем привязки
         view.addSubview(podelitsayButton)
         podelitsayButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            podelitsayButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            podelitsayButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -68),
             podelitsayButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
+        updateLikeButton()
     }
-
+    
 
     // центрирование картинки после зума, если картинка меньше экрана
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
