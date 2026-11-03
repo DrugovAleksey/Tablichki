@@ -132,7 +132,7 @@ final class SingleImageViewController: UIViewController, UIScrollViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print ("✅ Перешли на SingleImageViewController")
         // 5. кладем на вьюшку контроллера скролВью
         scrollView.delegate = self
         scrollView.translatesAutoresizingMaskIntoConstraints = false

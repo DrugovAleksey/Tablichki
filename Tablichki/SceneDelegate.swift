@@ -23,6 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // ✅ SplashViewController — не корневой, корневой - навигационный контроллер
         
         let splashVC = SplashViewController()
+    //    let wvvc = WVVC()
         let navController = UINavigationController(rootViewController: splashVC)
         
         window.rootViewController = navController

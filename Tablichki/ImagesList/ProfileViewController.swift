@@ -14,7 +14,7 @@ final class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         person()
-        print(" Это ProfileViewController ")
+        print("✅  Это ProfileViewController")
         
     }
     

@@ -15,7 +15,13 @@ class OAuth2TokenStorage {
     
     private let defaults = UserDefaults.standard
     private static let tokenKey = "access_token"
+    private static let created_at = "created_at"
+    private static let refresh_token = "refresh_token"
+    private static let scope = "scope"
+    private static let tokey_type = "token_type"
+    private static let user_id = "user_id"
     private static let name = "username"
+
     
     // Вычисляемое свойство: сразу считается и пишет в UserDefaults
     var token: String? {
@@ -36,7 +42,7 @@ class OAuth2TokenStorage {
         set { defaults.set(newValue, forKey: Self.name) }
     }
     
-    // если надо сохранить другие поля таки способом
+    // если надо сохранить другие поля таким способом
 //    var refreshToken: String? {
 //        get { defaults.string(forKey: "refresh_token") }
 //        set { defaults.set(newValue, forKey: "refresh_token") }
@@ -51,7 +57,8 @@ class OAuth2TokenStorage {
     // сохраняем все в UserDefaults
     func tokenStorage (storage: OAuthTokenResponseBody?) {
         guard let storage = storage else {return}
-        
+        print("❌ tokenStorage: пришёл nil — ничего не сохраняем")
+
         UserDefaults.standard.set(storage.access_token, forKey: "access_token")
         UserDefaults.standard.set(storage.created_at, forKey: "created_at")
         UserDefaults.standard.set(storage.refresh_token, forKey: "refresh_token")
@@ -59,5 +66,26 @@ class OAuth2TokenStorage {
         UserDefaults.standard.set(storage.token_type, forKey: "token_type")
         UserDefaults.standard.set(storage.user_id, forKey: "user_id")
         UserDefaults.standard.set(storage.username, forKey: "username")
+    }
+    
+    
+    
+    // Функция сброса всех ключей
+    func resetStorage() {
+        let keyToRemove = [
+            Self.tokenKey,
+            Self.name,
+            "refresh_token",
+            "created_at",
+            "scope",
+            "token_type",
+            "user_id"
+        ]
+        
+        keyToRemove.forEach { key in
+            defaults.removeObject(forKey: key)
+        }
+        // Сохраняем изменения сразу
+        defaults.synchronize()
     }
 }

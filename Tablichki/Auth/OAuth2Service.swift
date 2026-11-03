@@ -20,6 +20,8 @@ final class OAuth2Service {
     // в нее приходит в переменную code строка с кодом в качестве входных данных и берутся все данные из массива URLComponents.queryItems, в который уже дозаписали в "code" значение ключа code
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         // проверим доступность адреса для передачи на него запроса с токеном
+        print ("✅ Перешли на OAuth2Service")
+        
         guard var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token") else {
             return nil
         }
@@ -42,9 +44,12 @@ final class OAuth2Service {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        print("request в makeOAuthTokenRequest <->", request)
+//        print("request в makeOAuthTokenRequest <->", request)
         return request
     }
+    
+    
+    
     
     // функци fetchOAuthToken создающая полноценный запрос к серверу по методу "POST" с применением выше используемой функции авторизации makeOAuthTokenRequest
     func fetchOAuthToken(
@@ -52,14 +57,14 @@ final class OAuth2Service {
         completion: @escaping (Result <Data, Error>)
         -> Void)
     {
-        print()
-        print("1 fetchOAuthToken - запущена")
+//        print()
+//        print("✅ 1 fetchOAuthToken - запущена")
         // 1. Получаем готовый запрос из функции makeOAuthTokenRequest
         guard let request = makeOAuthTokenRequest(code: code) else { print ("Не удалось сформировать запрос")
             return
         }
-        print()
-        print("2 request -> ", request)
+//        print()
+//        print("✅ 2 request -> ", request)
         
         // 2. Выполняем запрос через URLSession
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -74,8 +79,8 @@ final class OAuth2Service {
                 completion(.failure(NSError(domain: "OAuthError", code: -2, userInfo: [NSLocalizedDescriptionKey: "Нет данных в ответе"])))
                 return
             }
-            print()
-            print("3 data ->", data)
+//            print()
+//            print("✅ 3 data ->", data)
 
             // проверяем HTTP-статус
             guard let httpResponse = response as? HTTPURLResponse else {
@@ -93,13 +98,14 @@ final class OAuth2Service {
                 completion(.failure(error))
                 return
             }
-                print()
-                print("4 httpResponse ->", httpResponse)
+//                print()
+//                print("✅ 4 httpResponse ->", httpResponse)
             
             // если все в норме, то здесь получаем данные
             // ✅ Возвращаем данные на главный поток, если дальше будет UI
             DispatchQueue.main.async {
                 completion(.success(data))
+                print("✅ Токен сохранён, переходим в приложение")
             }
         }
         task.resume()

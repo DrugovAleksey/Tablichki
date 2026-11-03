@@ -13,7 +13,7 @@ class ImagesListViewController: UIViewController, ImageListCellDelegate {
     
     
     func cellButton(_ cell: ImageListCell, didTapLikeFor model: CellModel) {
-        print("Пользователь нажал лайк на фото: \(model.titleDate)")
+//        print("Пользователь нажал лайк на фото: \(model.titleDate)")
         // Здесь обновляем логику:
                 // - обновить модель (добавить лайк)
                 // - отправить запрос на бэкенд
@@ -71,8 +71,8 @@ class ImagesListViewController: UIViewController, ImageListCellDelegate {
 
         let storage = OAuth2TokenStorage.shared
         
-        print("access_token", storage.token ?? "нет ключа в хранилище")
-        print("username", storage.name ?? " нет имени пользователя")
+//        print("access_token", storage.token ?? "нет ключа в хранилище")
+//        print("username", storage.name ?? " нет имени пользователя")
     }
 }
 

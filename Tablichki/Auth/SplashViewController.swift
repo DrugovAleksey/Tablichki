@@ -10,9 +10,13 @@ import UIKit
 
 class SplashViewController: UIViewController {
     
-    // введем переменную которая берет данных из хранилища
+    // введем переменную которая берет данные из хранилища
     private let storage = OAuth2TokenStorage.shared
     
+    let tabBarVC = UITabBarController()
+
+    private var goOut = true
+
     // вьюшка для картинки
     let viewImageSplash: UIImageView = {
         let viewIS = UIImageView()
@@ -24,45 +28,84 @@ class SplashViewController: UIViewController {
     // переменная картинки для спрашь экрана
     let image: UIImage? = UIImage(named: "splash_screen_logo")
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .ypBlackIOS
-        razmetka()
-        print("разметка загрузилась")
-
-
-    }
     
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        print("✅ SplashViewController показан")
-
-        // Запускаем анимацию лого (если есть)
-        animateLogo()
-
-        // Таймер на 3 секунды: потом сработает performRouting()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
-            self?.performRouting()
-        }
-        
-    }
+    // Анимация лого
     private func animateLogo() {
         viewImageSplash.alpha = 0 // прозрачность
-        viewImageSplash.transform = CGAffineTransform(scaleX: 0.1, y: 0.1).rotated(by: .pi / 4) // стартовые размеры
+        viewImageSplash.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)//.rotated(by: .pi / 4) // стартовые размеры
 
         UIView.animate(
-            withDuration: 3.0, // замедление (время проигрывания)
-            delay: 0.5, // задержка анимации
+            withDuration: 2.0, // замедление (время проигрывания)
+            delay: 0, // задержка анимации
             usingSpringWithDamping: 0.8, //(0..1, пружинит)
-            initialSpringVelocity: 15.0 // увеличение с возвращением (пружинная анимация)
+            initialSpringVelocity: 1.0 // увеличение с возвращением (пружинная анимация)
         ) {
             self.viewImageSplash.alpha = 1
             self.viewImageSplash.transform = .identity
         }
     }
     
+    
+    
+    
+    // MARK: ------- МАРШРУТЫ -----------------
+    
+    // создадим функци - "Выполнить маршутизацию" - performRouting
+    func performRouting() {
+        
+        guard let window = self.view.window else { return }
+        
+        // проверяем наличие сохраненного токена в хранилище
+        if storage.token != nil {
+            
+            // тогда пользователь авторизован и мы его переключаем на экран с пользовательскими данными (ProfileViewController) или галерею (ImagesListViewController)
+            print ("Пользователь \(storage.name ?? "") авторизован")
+            
+            // ✅ Авторизован: собираем таббар как новый root
+            
+            // вкладка первая
+            let imagesListVC = ImagesListViewController()
+            
+            imagesListVC.tabBarItem = UITabBarItem (
+                title: nil,
+                image: UIImage(named: "tab_editorial_active")?.withRenderingMode(.alwaysOriginal),
+                tag: 0
+                )
+            
+            // вкладка вторая
+            let profileVC = ProfileViewController()
+            profileVC.tabBarItem = UITabBarItem(
+                title: nil,
+                image: UIImage(named: "tab_profile_active")?.withRenderingMode(.alwaysOriginal),
+                tag: 1
+            )
+            
+            // собираем сам ТабБарКонтроллер
+            tabBarVC.tabBar.backgroundColor = .ypBlackIOS
+            tabBarVC.viewControllers = [imagesListVC, profileVC]
+            tabBarVC.selectedIndex = 0
+            
+            // делаем рутовым (основным) экраном контроллер ТабБар
+            window.rootViewController = tabBarVC
+
+            print("✅ Переход на TabBarController выполнен")
+
+        } else {
+            // иначе мы его переключаем на экран с авторизацией AuthViewController
+            print ("❌ Пользователь не авторизован")
+            // ❌ Не авторизован: ставим экран входа как новый root
+
+            let authVC = AuthViewController()
+            navigationController?.pushViewController(authVC, animated: true)
+      //      window.rootViewController = authVC
+            print ("✅ Переход на экран AuthViewController совершен")
+        }
+    }
+    
+    
+    
+    // MARK: - Разметка (КОНСТРЕЙНТЫ)
     private func razmetka() {
         view.addSubview(viewImageSplash)
  
@@ -79,57 +122,59 @@ class SplashViewController: UIViewController {
         ])
     }
     
-    // создадим функци - "Выполнить маршутизацию" - performRouting
-    func performRouting() {
+    
+    
+    
+    // MARK: ---- Вывод на ЭКРАН -----------------
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .ypBlackIOS
         
-        guard let window = self.view.window else { return }
+        razmetka()
         
-        // сбросим токен для появления окна авторизации
-     //   storage.token = nil
-        
-        // проверяем наличие сохраненного токена в хранилище
-        if storage.token != nil {
+        // Запускаем анимацию лого (если есть)
+        animateLogo()
+
+        // Таймер на 3 секунды: потом сработает performRouting()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
             
-            // тогда пользователь авторизован и мы его переключаем на экран с пользовательскими данными (ProfileViewController) или галерею (ImagesListViewController)
-            print ("Пользователь \(storage.name ?? "") авторизован")
-            
-            // ✅ Авторизован: собираем таббар как новый root
-            // вкладка первая
-            let imagesListVC = ImagesListViewController()
-            
-            imagesListVC.tabBarItem = UITabBarItem (
-                title: "",
-                image: UIImage(named: "tab_editorial_active")?.withRenderingMode(.alwaysOriginal),
-                tag: 0
-                )
-            
-            // вкладка вторая
-            let profileVC = ProfileViewController()
-            profileVC.tabBarItem = UITabBarItem(
-                title: "",
-                image: UIImage(named: "tab_profile_active")?.withRenderingMode(.alwaysOriginal),
-                tag: 1
+            let modelAlert = AlertModel(
+                alertTitle: "Запущен SplashController",
+                alertMessage: "Сбрасываем ключи доступа для загрузги окна авторизации? Ваш токен: \(self?.storage.token ?? " пустой ")",
+                firstButtonTitle: "Сбрасываем",
+                firstButtonAction: { [weak self] in
+                    guard let self = self else {return}
+                    OAuth2TokenStorage.shared.resetStorage()
+                    performRouting()
+                    print("🚀  Нажата кнопка СБРОСа и переходим на экран авторизации")
+                },
+                secondButtonTitle: "Не сбрасываем",
+                secondButtonAction: { [weak self] in
+                    guard let self = self else {return}
+                    performRouting()
+                    print("🚀  Нажата кнопка ТОКЕН и переходим на экран TabBarController \n Ваш токен: \(storage.token)")
+                }
             )
             
-            // собираем сам ТабБарКонтроллер
-            let tabBarVC = UITabBarController()
-            tabBarVC.tabBar.backgroundColor = .ypBlackIOS
-            tabBarVC.viewControllers = [imagesListVC, profileVC]
-            tabBarVC.selectedIndex = 0
-            // делаем рутовым (основным) экраном контроллер ТабБар
-            window.rootViewController = tabBarVC
-
-            print("✅ Переход на TabBarController выполнен")
-
-        } else {
-            // иначе мы его переключаем на экран с авторизацией AuthViewController
-            print ("❌ Пользователь не авторизован")
-            // ❌ Не авторизован: ставим экран входа как новый root
+            self?.showAlert(with: modelAlert)
             
-            let authVC = AuthViewController()
-            navigationController?.pushViewController(authVC, animated: true)
-          //  window.rootViewController = authVC
-            print ("✅ Переход на экран AuthViewController совершен")
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        goOut = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        print("✅ SplashViewController показан")
+
+        if goOut == false {
+            tabBarVC.selectedIndex = 0
         }
     }
 }
+
