@@ -6,12 +6,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "Backward 2.svg",
+      "filename" : "Backward@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Backward 1.svg",
+      "filename" : "Backward@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

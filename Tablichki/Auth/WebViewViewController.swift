@@ -9,6 +9,14 @@ import UIKit
 import WebKit
 
 class WebViewViewController: UIViewController {
+    // Функция конфигурации кнопки назад в навигаторКонтроллер
+    private func configureBackButton() {
+  //      navigationController?.navigationBar.backgroundColor = .systemBackground
+
+    //    navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+   //     navigationItem.leftBarButtonItem?.image = UIImage(named: "Backward")
+    }
+    
     
     // создаем webView на контроллере созданном при переходе после нажатия на кнопку Войти
     private lazy var webView: WKWebView = {
@@ -17,7 +25,7 @@ class WebViewViewController: UIViewController {
         
         let v = WKWebView(frame: .zero, configuration: config)
         v.translatesAutoresizingMaskIntoConstraints = false
-        v.backgroundColor = .brown
+        v.backgroundColor = .ypWhiteIOS
         return v
     }()
     
@@ -25,21 +33,12 @@ class WebViewViewController: UIViewController {
     private lazy var progressView: UIProgressView = {
         let v = UIProgressView()
         v.translatesAutoresizingMaskIntoConstraints = false
-        v.tintColor = .systemRed // цвет заполненной части
-        v.trackTintColor = .lightGray //цвет фона плоскости
+        v.tintColor = .ypBlackIOS // цвет заполненной части
+        v.trackTintColor = .ypGrayIOS //цвет фона плоскости
         v.progressViewStyle = .bar
         return v
     }()
-    
-    // ведем активитиИндикатор
-    private var activityIndicator: UIActivityIndicatorView = {
-        let a = UIActivityIndicatorView()
-        a.translatesAutoresizingMaskIntoConstraints = false
-        a.style = .large
-        a.color = .ypRedIOS
-        return a
-    }()
-    
+
     
     // создадим переменную делегата со слабой ссылкой
     weak var delegate: WebViewControllerDelegate?
@@ -98,8 +97,6 @@ class WebViewViewController: UIViewController {
                 forKeyPath: keyPath,
                 of: object, change: change, context: context)
         }
-        activityIndicator.stopAnimating()
-
     }
     
     // Функция обновления updateProgress
@@ -117,7 +114,7 @@ class WebViewViewController: UIViewController {
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
         NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.rightAnchor.constraint(equalTo: view.rightAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -130,15 +127,6 @@ class WebViewViewController: UIViewController {
             progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             progressView.rightAnchor.constraint(equalTo: view.rightAnchor),
             progressView.heightAnchor.constraint(equalToConstant: 10)
-        ])
-        
-        // конфигурируем активитиИндикатор
-        view.addSubview(activityIndicator)
-        NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            activityIndicator.widthAnchor.constraint(equalToConstant: 100),
-            activityIndicator.heightAnchor.constraint(equalToConstant: 100)
         ])
     }
     
@@ -163,7 +151,7 @@ class WebViewViewController: UIViewController {
             
         // 3. ОДИН единственный load - только OAuth-страница
         loadAuthView()
-
+        configureBackButton()
         updateProgress()
         print("[WebView] Страница авторизации отправлена на загрузку")
     }
@@ -179,10 +167,6 @@ class WebViewViewController: UIViewController {
             forKeyPath: #keyPath(WKWebView.estimatedProgress),
             options: .new,
             context: nil)
-   //     updateProgress()
-        
-        // Запускаем индикатор
-        activityIndicator.startAnimating()
     }
     
     
@@ -193,9 +177,6 @@ class WebViewViewController: UIViewController {
         webView.removeObserver(self,
                                forKeyPath: #keyPath(WKWebView.estimatedProgress),
                                context: nil)
-        
-        activityIndicator.stopAnimating()
-
     }
 }
 

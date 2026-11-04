@@ -9,21 +9,20 @@ import UIKit
 
 // Контроллер АВТОРИЗАЦИИ
 class AuthViewController: UIViewController, WebViewControllerDelegate {
-
     
     // на контроллере лого и кнопка войти
     private let image = UIImage(named: "Logo_of_Unsplash")
     private let imageLogoView = UIImageView()
     private lazy var buttonInCome: UIButton = {
         let btn = UIButton.systemButton(
-            with: UIImage(systemName: "arrow.right")!,
+            with: UIImage(),
             target: self,
             action: #selector(buttonIn)
         )
         btn.setTitle("Войти", for: .normal)
-        btn.titleLabel?.font = UIFont.systemFont(ofSize: 25, weight: .bold)
+        btn.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .bold)
         btn.tintColor = .ypBlackIOS
-        btn.backgroundColor = .ypWhiteIOS
+        btn.backgroundColor = .ypWhiteIOS.withAlphaComponent(0.8)
         btn.layer.cornerRadius = 16
         return btn
     }()
@@ -38,8 +37,7 @@ class AuthViewController: UIViewController, WebViewControllerDelegate {
         
         print("→ Нажата кнопка перехода на WebViewViewController")
     }
-    
-    
+
     
     // MARK: ------------- Реализация ПРОТОКОЛА ----------
     
@@ -135,6 +133,29 @@ class AuthViewController: UIViewController, WebViewControllerDelegate {
     
     // разметка
     func razmetka() {
+        
+        view.backgroundColor = .ypBlackIOS
+        
+        
+        // создае эффект размытия (как в Figma)
+        let effect = UIBlurEffect(style: .extraLight)
+        let blurView = UIVisualEffectView(effect: effect)
+        blurView.translatesAutoresizingMaskIntoConstraints = false
+        blurView.layer.masksToBounds = true
+        blurView.layer.cornerRadius = 16
+        buttonInCome.translatesAutoresizingMaskIntoConstraints = false
+
+        // Оборачиваем кнопку в этот эффект Блюр
+        view.addSubview(blurView)
+        
+        blurView.contentView.addSubview(buttonInCome)
+        NSLayoutConstraint.activate([
+            buttonInCome.topAnchor.constraint(equalTo: blurView.topAnchor),
+            buttonInCome.leadingAnchor.constraint(equalTo: blurView.leadingAnchor),
+            buttonInCome.trailingAnchor.constraint(equalTo: blurView.trailingAnchor),
+            buttonInCome.bottomAnchor.constraint(equalTo: blurView.bottomAnchor)
+        ])
+        
         // Проверка картинки логотипа Ансплашь
         if image == nil {
                 print("❌ Картинка 'Logo_of_Unsplash' не найдена!")
@@ -146,28 +167,30 @@ class AuthViewController: UIViewController, WebViewControllerDelegate {
         imageLogoView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             imageLogoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageLogoView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            imageLogoView.topAnchor.constraint(equalTo: view.topAnchor, constant: 272),
         ])
         
         // кнопка
-        view.addSubview(buttonInCome)
         buttonInCome.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            buttonInCome.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonInCome.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -90),
-            buttonInCome.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-            buttonInCome.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
-            buttonInCome.heightAnchor.constraint(equalToConstant: 48)
+            blurView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            blurView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -90),
+            blurView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
+            blurView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
+            blurView.heightAnchor.constraint(equalToConstant: 48)
         ])
     }
     
     // Функция конфигурации кнопки назад в навигаторКонтроллер
     private func configureBackButton() {
-        navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_black_button")
-        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button")
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "Назад", style: .plain, target: nil, action: nil)
-        navigationItem.backBarButtonItem?.tintColor = .systemBlue
+        guard let backImage = UIImage(named: "Backward")?.withRenderingMode(.alwaysOriginal) else {
+            print("❌ Картинка Backward не найдена")
+            return
+        }
+
+        navigationController?.navigationBar.backIndicatorImage = backImage
+        navigationController?.navigationBar.backIndicatorTransitionMaskImage = backImage
     }
     
     
@@ -177,6 +200,7 @@ class AuthViewController: UIViewController, WebViewControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         
         navigationItem.setHidesBackButton(true, animated: true)
         configureBackButton()
